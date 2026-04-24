@@ -1,0 +1,6 @@
+{
+  "editor.formatOnSave": true,
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "spring-boot.ls.problem.application-properties.PROP_UNKNOWN_PROPERTY": "IGNORE"
+}
