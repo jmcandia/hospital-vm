@@ -1,0 +1,26 @@
+spring:
+  # Configuración de la aplicación
+  application:
+    name: pacientes-microservice
+  # Configuración de la base de datos
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_hospital_vm_pacientes
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  # Configuración de Flyway
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  # Configuración de JPA/Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+server:
+  # Configuración del servidor
+  port: 8081
+  servlet:
+    context-path: /api
