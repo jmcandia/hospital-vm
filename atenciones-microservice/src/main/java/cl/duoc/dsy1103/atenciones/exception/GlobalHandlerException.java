@@ -1,4 +1,4 @@
-package cl.duoc.dsy1103.pacientes.exception;
+package cl.duoc.dsy1103.atenciones.exception;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -121,9 +121,11 @@ public class GlobalHandlerException {
 
     /**
      * Maneja la excepción MethodArgumentNotValidException lanzada cuando la
-     * validación de los datos de entrada falla. Devuelve una respuesta con el error
-     * y un mensaje descriptivo. El mensaje de error se obtiene de los errores de
-     * validación y se incluye en la lista de errores de la respuesta.
+     * validación
+     * de los datos de entrada falla. Devuelve una respuesta con el error y un
+     * mensaje descriptivo. El mensaje de error se obtiene de los errores de
+     * validación
+     * y se incluye en la lista de errores de la respuesta.
      * 
      * @param ex      La excepción MethodArgumentNotValidException lanzada.
      * @param request La solicitud HTTP que causó la excepción.

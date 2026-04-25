@@ -1,4 +1,4 @@
-package cl.duoc.dsy1103.pacientes.config;
+package cl.duoc.dsy1103.atenciones.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

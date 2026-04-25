@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cl.duoc.dsy1103.pacientes.dto.AtencionResponse;
 import cl.duoc.dsy1103.pacientes.dto.PacienteRequest;
 import cl.duoc.dsy1103.pacientes.dto.PacienteResponse;
 import cl.duoc.dsy1103.pacientes.dto.PacienteUpdateRequest;
@@ -110,5 +111,18 @@ public class PacienteController {
         log.info("DELETE /api/pacientes/eliminarPaciente/{}", id);
         pacienteService.eliminarPaciente(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Endpoint para obtener las atenciones de un paciente por su ID. Si el
+     * paciente no existe, devuelve un error NOT_FOUND 404.
+     * 
+     * @param id ID del paciente cuyas atenciones se desean obtener.
+     * @return Lista de atenciones del paciente.
+     */
+    @GetMapping("/{id}/atenciones")
+    public List<AtencionResponse> obtenerAtencionesPorPacienteId(@PathVariable Long id) {
+        log.info("GET /api/pacientes/{}/atenciones", id);
+        return pacienteService.buscarAtencionesPorPacienteId(id);
     }
 }

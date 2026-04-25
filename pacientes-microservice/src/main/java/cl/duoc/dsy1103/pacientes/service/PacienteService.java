@@ -6,10 +6,12 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cl.duoc.dsy1103.pacientes.client.AtencionClient;
+import cl.duoc.dsy1103.pacientes.dto.AtencionResponse;
 import cl.duoc.dsy1103.pacientes.dto.PacienteRequest;
 import cl.duoc.dsy1103.pacientes.dto.PacienteResponse;
 import cl.duoc.dsy1103.pacientes.dto.PacienteUpdateRequest;
-import cl.duoc.dsy1103.pacientes.exception.PacienteAlreadyExistsException;
+import cl.duoc.dsy1103.pacientes.exception.ConflictException;
 import cl.duoc.dsy1103.pacientes.mapper.PacienteMapper;
 import cl.duoc.dsy1103.pacientes.model.Paciente;
 import cl.duoc.dsy1103.pacientes.repository.PacienteRepository;
@@ -26,6 +28,9 @@ public class PacienteService {
 
     @Autowired
     private PacienteRepository pacienteRepository;
+
+    @Autowired
+    private AtencionClient atencionClient;
 
     @Autowired
     private PacienteMapper pacienteMapper;
@@ -78,7 +83,7 @@ public class PacienteService {
     public PacienteResponse crearPaciente(PacienteRequest request) {
         log.info("Creando paciente con RUN: {}", request.getRun());
         if (pacienteRepository.existsByRun(request.getRun())) {
-            throw new PacienteAlreadyExistsException("El RUN ya existe");
+            throw new ConflictException("El RUN ya existe");
         }
         Paciente paciente = pacienteRepository.save(pacienteMapper.fromRequest(request));
         return pacienteMapper.toResponse(paciente);
@@ -126,5 +131,20 @@ public class PacienteService {
             throw new NoSuchElementException("Paciente no encontrado");
         }
         pacienteRepository.deleteById(id);
+    }
+
+    /**
+     * Busca las atenciones de un paciente por su ID. Si el paciente no existe,
+     * lanza una excepción NoSuchElementException.
+     * 
+     * @param id ID del paciente cuyas atenciones se desean buscar.
+     * @return Lista de atenciones del paciente.
+     */
+    public List<AtencionResponse> buscarAtencionesPorPacienteId(Long id) {
+        log.info("Buscando atenciones para paciente con ID: {}", id);
+        if (!pacienteRepository.existsById(id)) {
+            throw new NoSuchElementException("Paciente no encontrado");
+        }
+        return atencionClient.obtenerAtencionPorPacienteId(id);
     }
 }
