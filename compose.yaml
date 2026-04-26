@@ -7,9 +7,29 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ""
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
-      - mysql_data:/var/lib/mysql
+      - ./.docker/mysql:/var/lib/mysql
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - observabilidad
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
+    ports:
+      - "8090:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: ""
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks:
       - observabilidad
   loki:
@@ -18,9 +38,16 @@ services:
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
+    healthcheck:
+      test: ["CMD", "loki", "-version"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    volumes:
+      - ./.docker/loki:/loki
     networks:
       - observabilidad
-
   grafana:
     image: grafana/grafana:main-ubuntu
     container_name: grafana
@@ -30,13 +57,57 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
     depends_on:
-      - loki
+      loki:
+        condition: service_healthy
+    volumes:
+      - ./.docker/grafana:/var/lib/grafana
+    networks:
+      - observabilidad
+  pacientes:
+    profiles:
+      - servicios
+    build:
+      context: ./pacientes-microservice
+      dockerfile: Dockerfile
+    container_name: pacientes
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_hospital_vm_pacientes
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      SERVICES_ATENCIONES_BASEURL: http://atenciones:8082/api/v1/atenciones
+      LOKI_URL: http://loki:3100/loki/api/v1/push
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
+    networks:
+      - observabilidad
+  atenciones:
+    profiles:
+      - servicios
+    build:
+      context: ./atenciones-microservice
+      dockerfile: Dockerfile
+    container_name: atenciones
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_hospital_vm_atenciones
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      SERVICES_PACIENTES_BASEURL: http://pacientes:8081/api/v1/pacientes
+      LOKI_URL: http://loki:3100/loki/api/v1/push
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
     networks:
       - observabilidad
 
 networks:
   observabilidad:
     driver: bridge
-
-volumes:
-  mysql_data:

@@ -5,9 +5,15 @@
   - [Aprendizajes esperados](#aprendizajes-esperados)
     - [Desafíos](#desafíos)
   - [Prerrequisitos](#prerrequisitos)
-    - [Servicios de infraestructura](#servicios-de-infraestructura)
-    - [Configuración de Loki en Grafana](#configuración-de-loki-en-grafana)
-    - [Microservicios](#microservicios)
+  - [Ejecución](#ejecución)
+    - [Levantar todo el proyecto](#levantar-todo-el-proyecto)
+    - [Levantar solo la infraestructura](#levantar-solo-la-infraestructura)
+    - [Detener los servicios](#detener-los-servicios)
+  - [Monitoreo con Grafana](#monitoreo-con-grafana)
+    - [Configurar `Loki` como fuente de datos](#configurar-loki-como-fuente-de-datos)
+    - [Consultar logs](#consultar-logs)
+    - [Filtros útiles](#filtros-útiles)
+  - [Administración de base de datos](#administración-de-base-de-datos)
   - [Autor](#autor)
   - [Licencia](#licencia)
 
@@ -44,70 +50,141 @@ Entre los principales aprendizajes destacan:
 
 Antes de ejecutar el proyecto, asegúrate de tener instalado lo siguiente:
 
-- **Java 17** o superior — [Descargar](https://www.oracle.com/java/technologies/downloads/)
-- **Docker Desktop** — [Descargar](https://www.docker.com/products/docker-desktop/)
+- **JDK 17** o superior: Es un paquete de software esencial que proporciona las herramientas necesarias para desarrollar, compilar, depurar y ejecutar aplicaciones Java. Para descargarlo ve a la [página oficial](https://www.oracle.com/java/technologies/downloads/).
+- **Docker Desktop**: Es una aplicación que proporciona un entorno de desarrollo para crear, gestionar y ejecutar contenedores Docker, incluyendo Docker Engine, Docker Compose, CLI y una interfaz gráfica (GUI). Para instalarlo, visita la [página oficial](https://www.docker.com/products/docker-desktop/).
 
-### Servicios de infraestructura
+Adicionalmente, si usas [`Visual Studio Code`](https://code.visualstudio.com) como `IDE`, te recomiendo instalar las siguientes extensiones:
 
-Los servicios de base de datos y observabilidad se levantan con `Docker Compose`. Desde la raíz del proyecto ejecuta:
+- Extension Pack for Java: Extensiones populares para el desarrollo en Java que ofrecen IntelliSense para Java, depuración, pruebas, compatibilidad con Maven/Gradle, gestión de proyectos y mucho más.
+- Spring Boot Extension Pack: Una colección de extensiones para desarrollar aplicaciones Spring Boot.
+
+## Ejecución
+
+Para ejecutar las aplicaciones y los servicios de base de datos y observabilidad necesitamos `Docker Compose` instalado.
+
+### Levantar todo el proyecto
+
+Para levantar la infraestructura y los microservicios juntos, ejecuta desde la raíz del proyecto:
+
+```bash
+docker compose --profile servicios up --build -d
+```
+
+Esto levanta los siguientes contenedores:
+
+| Contenedor                | Descripción                 | Puerto |
+|:--------------------------|:----------------------------|:-------|
+| `mysql`                   | Base de datos MySQL 8       | `3306` |
+| `phpmyadmin`              | Administrador de MySQL      | `8090` |
+| `loki`                    | Centralización de logs      | `3100` |
+| `grafana`                 | Visualización de logs       | `3000` |
+| `pacientes-microservice`  | Microservicio de pacientes  | `8081` |
+| `atenciones-microservice` | Microservicio de atenciones | `8082` |
+
+### Levantar solo la infraestructura
+
+Durante el desarrollo es útil levantar únicamente la infraestructura y ejecutar los microservicios localmente para tener hot reload y depuración. Para eso ejecuta:
 
 ```bash
 docker compose up -d
 ```
 
-Esto levanta los siguientes contenedores:
+Esto levanta solo los servicios de infraestructura:
 
-| Contenedor | Descripción            | Puerto |
-|:-----------|:-----------------------|:-------|
-| `mysql`    | Base de datos MySQL 8  | `3306` |
-| `loki`     | Centralización de logs | `3100` |
-| `grafana`  | Visualización de logs  | `3000` |
+| Contenedor   | Descripción            | Puerto |
+|:-------------|:-----------------------|:-------|
+| `mysql`      | Base de datos MySQL 8  | `3306` |
+| `phpmyadmin` | Administrador de MySQL | `8090` |
+| `loki`       | Centralización de logs | `3100` |
+| `grafana`    | Visualización de logs  | `3000` |
 
-Grafana está disponible en [http://localhost:3000](http://localhost:3000) con las credenciales `admin / admin`.
-
-Para detener los contenedores de Docker manteniendo los datos:
+Luego, desde la carpeta de cada microservicio, ejecútalos de forma independiente:
 
 ```bash
+# Microservicio de pacientes
+cd pacientes-microservice
+./mvnw spring-boot:run
+
+# Microservicio de atenciones
+cd atenciones-microservice
+./mvnw spring-boot:run
+```
+
+### Detener los servicios
+
+> **Importante:** usa siempre el mismo perfil con el que levantaste los servicios. De lo contrario, los contenedores de los microservicios seguirán conectados a la red y Docker mostrará el error `Network is still in use`.
+
+Para detener los contenedores manteniendo los datos:
+
+```bash
+# Si levantaste con perfil
+docker compose --profile servicios down
+
+# Si levantaste sin perfil
 docker compose down
 ```
 
 Si además deseas eliminar los volúmenes (esto borrará todos los datos de la base de datos y los logs almacenados):
 
 ```bash
+# Si levantaste con perfil
+docker compose --profile servicios down -v
+
+# Si levantaste sin perfil
 docker compose down -v
 ```
 
-### Configuración de Loki en Grafana
+## Monitoreo con Grafana
 
-Para visualizar los logs en Grafana, conecta Loki como fuente de datos:
+Grafana está disponible en [http://localhost:3000](http://localhost:3000) con las credenciales `admin / admin`.
 
-1. Accede a [http://localhost:3000](http://localhost:3000) con `admin / admin`
-2. Ve a **Connections → Data sources → Add data source**
-3. Selecciona **Loki**
-4. En la URL ingresa `http://loki:3100`
-5. Haz clic en **Save & test**
+### Configurar `Loki` como fuente de datos
 
-Una vez configurado, ve a **Explore**, selecciona **Loki** como fuente y usa la siguiente consulta para ver los logs:
+1. Ve a **Connections → Data sources → Add data source**
+2. Selecciona **Loki**
+3. En la URL ingresa `http://loki:3100`
+4. Haz clic en **Save & test**
+
+### Consultar logs
+
+Ve a **Explore**, selecciona **Loki** como fuente de datos y usa `LogQL` para consultar:
 
 ```logql
-{app="pacientes"}
-{app="atenciones"}
+# Todos los logs de un servicio
+{app="pacientes-microservice"}
+{app="atenciones-microservice"}
+
+# Solo errores
+{app="pacientes-microservice"} | json | level="ERROR"
+
+# Buscar texto específico
+{app="pacientes-microservice"} |= "Paciente no encontrado"
+
+# Logs de los dos servicios al mismo tiempo
+{app=~"pacientes-microservice|atenciones-microservice"}
 ```
 
-### Microservicios
+> **Nota:** Para más información acerca de `LogQL`, visita la [documentación oficial](https://grafana.com/docs/loki/latest/query/).
 
-Cada microservicio debe ejecutarse de forma independiente. Desde la carpeta de cada uno:
+### Filtros útiles
 
-```bash
-./mvnw spring-boot:run
-```
+| Operador  | Descripción       | Ejemplo                    |
+|:----------|:------------------|:---------------------------|
+| `\|=`     | Contiene texto    | `\|= "error"`              |
+| `!=`      | No contiene texto | `!= "INFO"`                |
+| `\|~`     | Expresión regular | `\|~ "paciente.*"`         |
+| `\| json` | Parsear JSON      | `\| json \| level="ERROR"` |
 
-| Microservicio | Puerto |
-|:--------------|:-------|
-| `pacientes`   | `8081` |
-| `atenciones`  | `8082` |
+## Administración de base de datos
 
-Los microservicios se detienen con `Ctrl + C` en la terminal donde están ejecutándose.
+**phpMyAdmin** es una herramienta gratuita y de código abierto, escrita en PHP, que proporciona una interfaz gráfica basada en web para gestionar bases de datos **MySQL** y **MariaDB**. Permite realizar tareas complejas como crear, modificar, eliminar tablas, ejecutar consultas SQL y gestionar usuarios sin usar la línea de comandos. Está disponible en [http://localhost:8090](http://localhost:8090) e inicia sesión automáticamente con el usuario `root`.
+
+Desde aquí puedes:
+
+- Explorar las bases de datos `db_hospital_vm_pacientes` y `db_hospital_vm_atenciones`
+- Ejecutar consultas SQL directamente
+- Revisar la estructura de las tablas y los datos generados por **Flyway**
+- Exportar o importar datos en formato SQL o CSV
 
 ## Autor
 

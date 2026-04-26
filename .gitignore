@@ -29,3 +29,6 @@ build/
 # Logs
 logs
 *.log
+
+# Docker
+.docker/
