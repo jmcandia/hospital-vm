@@ -27,4 +27,4 @@ server:
 services:
   # Configuración de servicios externos
   pacientes:
-    base-url: http://localhost:8081/api/v1/pacientes
+    baseUrl: http://localhost:8081/api/v1/pacientes

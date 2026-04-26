@@ -13,7 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class WebClientConfig {
 
-    @Value("${services.atenciones.base-url}")
+    @Value("${services.atenciones.baseUrl}")
     private String baseUrl;
 
     @Bean
