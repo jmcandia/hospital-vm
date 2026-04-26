@@ -1,19 +1,17 @@
 <configuration>
     <springProperty scope="context" name="APP_NAME" source="spring.application.name"
         defaultValue="pacientes-microservice" />
-    <!-- Consola: formato por defecto de Spring Boot -->
+    <!-- Appender para registrar los logs en consola -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>
-                %d{yyyy-MM-dd HH:mm:ss} %highlight(%-5level) %magenta([${APP_NAME}])
-                %cyan(%logger{36}) - %msg%n
-            </pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [${APP_NAME}] %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
         </encoder>
     </appender>
-    <!-- Mapear spring.application.name a una variable de Logback -->
+    <!-- Appender para registrar los logs en Loki -->
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
         <http>
-            <url>http://localhost:3100/loki/api/v1/push</url>
+            <url>${LOKI_URL:-http://localhost:3100/loki/api/v1/push}</url>
             <connectionTimeoutMs>3000</connectionTimeoutMs>
             <requestTimeoutMs>5000</requestTimeoutMs>
         </http>
