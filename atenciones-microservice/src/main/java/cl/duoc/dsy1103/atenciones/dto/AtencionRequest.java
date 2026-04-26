@@ -3,6 +3,7 @@ package cl.duoc.dsy1103.atenciones.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import cl.duoc.dsy1103.atenciones.validation.ValidRun;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -39,6 +40,7 @@ public class AtencionRequest {
     private String comentario;
 
     @NotBlank(message = "El RUN del paciente es obligatorio")
-    @Size(min = 9, max = 10, message = "El RUN del paciente debe tener entre 9 y 10 caracteres")
+    @Size(min = 8, max = 10, message = "El RUN del paciente debe tener entre 8 y 10 caracteres")
+    @ValidRun(message = "El RUN del paciente debe ser válido y seguir el formato correcto")
     private String runPaciente;
 }
