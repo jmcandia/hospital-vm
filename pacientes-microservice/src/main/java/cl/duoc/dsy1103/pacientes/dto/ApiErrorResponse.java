@@ -1,4 +1,4 @@
-package cl.duoc.dsy1103.pacientes.exception;
+package cl.duoc.dsy1103.pacientes.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
