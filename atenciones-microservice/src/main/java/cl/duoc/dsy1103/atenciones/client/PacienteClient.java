@@ -44,11 +44,12 @@ public class PacienteClient {
      * @throws RuntimeException       Para cualquier otro error que ocurra al
      *                                llamar al servicio de pacientes.
      */
-    public PacienteResponse obtenerPacientePorRun(String run) {
+    public PacienteResponse obtenerPacientePorRun(String run, String token) {
         log.info("Obteniendo información del paciente con RUN: {}", run);
         try {
             return webClient.get()
                     .uri("/run/{run}", run)
+                    .header("Authorization", token)
                     .retrieve()
                     .bodyToMono(PacienteResponse.class)
                     .block();

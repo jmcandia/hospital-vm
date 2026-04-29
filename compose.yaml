@@ -3,10 +3,11 @@ services:
     image: mysql:latest
     container_name: mysql
     ports:
-      - "3306:3306"
+      - "3307:3307"
     environment:
       MYSQL_ROOT_PASSWORD: ""
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_TCP_PORT: 3307
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--silent"]
       interval: 10s
@@ -25,6 +26,7 @@ services:
       - "8090:80"
     environment:
       PMA_HOST: mysql
+      PMA_PORT: 3307
       PMA_USER: root
       PMA_PASSWORD: ""
     depends_on:
@@ -71,7 +73,7 @@ services:
       dockerfile: Dockerfile
     container_name: pacientes
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_hospital_vm_pacientes
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3307/db_hospital_vm_pacientes
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ""
       SERVICES_ATENCIONES_BASEURL: http://atenciones:8082/api/v1/atenciones
@@ -93,7 +95,7 @@ services:
       dockerfile: Dockerfile
     container_name: atenciones
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_hospital_vm_atenciones
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3307/db_hospital_vm_atenciones
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ""
       SERVICES_PACIENTES_BASEURL: http://pacientes:8081/api/v1/pacientes

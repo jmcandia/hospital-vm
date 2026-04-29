@@ -4,7 +4,7 @@ spring:
     name: pacientes-microservice
   # Configuración de la base de datos
   datasource:
-    url: jdbc:mysql://localhost:3306/db_hospital_vm_pacientes
+    url: jdbc:mysql://localhost:3307/db_hospital_vm_pacientes
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -28,3 +28,5 @@ services:
   # Configuración de servicios externos
   atenciones:
     baseUrl: http://localhost:8082/api/v1/atenciones
+jwt:
+  secret: nklb8734f783f478734gg7784hhr73477fbbv7734bbpf78734gp9uf7976934h98fdgy794

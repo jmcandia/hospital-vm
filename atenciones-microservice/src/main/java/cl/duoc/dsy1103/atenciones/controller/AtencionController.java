@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,9 +51,10 @@ public class AtencionController {
      * @return La atención creada.
      */
     @PostMapping
-    public ResponseEntity<AtencionResponse> crearAtencion(@Valid @RequestBody AtencionRequest atencionRequest) {
+    public ResponseEntity<AtencionResponse> crearAtencion(@Valid @RequestBody AtencionRequest atencionRequest,
+            @RequestHeader("Authorization") String token) {
         log.info("POST /api/atenciones");
-        AtencionResponse atencionResponse = atencionService.crearAtencion(atencionRequest);
+        AtencionResponse atencionResponse = atencionService.crearAtencion(atencionRequest, token);
         return new ResponseEntity<>(atencionResponse, HttpStatus.CREATED);
     }
 

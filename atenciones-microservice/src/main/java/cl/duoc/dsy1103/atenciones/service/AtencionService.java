@@ -39,11 +39,12 @@ public class AtencionService {
      *                        RUN del paciente y los detalles de la atención.
      * @return La respuesta que contiene los detalles de la atención creada.
      */
-    public AtencionResponse crearAtencion(AtencionRequest atencionRequest) {
+    public AtencionResponse crearAtencion(AtencionRequest atencionRequest, String token) {
         log.info("Creando nueva atención para el paciente RUN: {}",
                 atencionRequest.getRunPaciente());
         // 1. Consultar al microservicio de pacientes para obtener el ID del paciente
-        PacienteResponse pacienteResponse = pacienteClient.obtenerPacientePorRun(atencionRequest.getRunPaciente());
+        PacienteResponse pacienteResponse = pacienteClient.obtenerPacientePorRun(atencionRequest.getRunPaciente(),
+                token);
         // 2. Crear la atención utilizando el ID del paciente obtenido
         Atencion atencion = atencionMapper.fromRequest(atencionRequest);
         atencion.setPacienteId(pacienteResponse.getId());

@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "AtencionesMicroserviceApplication",
+            "request": "launch",
+            "mainClass": "cl.duoc.dsy1103.atenciones.AtencionesMicroserviceApplication",
+            "projectName": "atenciones-microservice"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-PacientesMicroserviceApplication<pacientes-microservice>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "cl.duoc.dsy1103.pacientes.PacientesMicroserviceApplication",
+            "projectName": "pacientes-microservice",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

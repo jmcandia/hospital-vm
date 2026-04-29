@@ -4,7 +4,7 @@ spring:
     name: atenciones-microservice
   # Configuración de la base de datos
   datasource:
-    url: jdbc:mysql://localhost:3306/db_hospital_vm_atenciones
+    url: jdbc:mysql://localhost:3307/db_hospital_vm_atenciones
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
