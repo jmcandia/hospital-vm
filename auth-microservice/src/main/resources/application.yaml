@@ -1,0 +1,29 @@
+spring:
+  # Configuración de la aplicación
+  application:
+    name: auth-microservice
+  # Configuración de la base de datos
+  datasource:
+    url: jdbc:mysql://localhost:3307/db_hospital_vm_usuarios
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  # Configuración de Flyway
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  # Configuración de JPA/Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+server:
+  # Configuración del servidor
+  port: 8080
+  servlet:
+    context-path: /api
+jwt:
+  secret: nklb8734f783f478734gg7784hhr73477fbbv7734bbpf78734gp9uf7976934h98fdgy794
+  expiration: 3600000
